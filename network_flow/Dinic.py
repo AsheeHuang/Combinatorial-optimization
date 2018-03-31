@@ -1,5 +1,5 @@
 from copy import deepcopy
-
+from time import time
 def read_graph(path) :
     # #
     # G = {0:{1:10,2:10},
@@ -111,37 +111,40 @@ def update_graph(level_graph, G_f, aug_path, min_flow, connect):
             connect[v].remove(j)
 
     return level_graph
-
-
-if __name__ == "__main__":
-    # read_graph("./Data/elist1440.txt")
-    G, n = read_graph("./Data/karzanov_example2.txt")  # graph, # of vertices , # of edges
+def init_Gf(G) :
     G_f = deepcopy(G)
 
     for i in range(len(G_f)):
         for j in G_f[i]:
             G_f[i][j] = 0
+    return G_f
 
-    total_flow = 0
-    prev_flow = 0
-    while 1 :
-        level_graph,connect= get_level_graph(G,G_f)
-        for i in level_graph :
-            print(i,level_graph[i])
-        prev_flow = total_flow
+if __name__ == "__main__":
+    file = [i * 1000 for i in range(1, 11)]
+
+    for v_num in file:
+        data_path = "./Data/" + str(v_num) + ".txt"
+        start = time()
+        G, n = read_graph(data_path)  # graph, # of vertices
+        G_f = init_Gf(G) #initailize the flow graph
+
+        total_flow = 0
+        prev_flow = 0
         while 1 :
-            aug_path = find_path(level_graph,connect)
-            min_flow = find_min_flow(aug_path)
-            print(aug_path,min_flow)
-            total_flow += min_flow
-            if min_flow == False :  #blocking flow
+            level_graph,connect= get_level_graph(G,G_f) #get level graph
+            prev_flow = total_flow
+            while 1 :
+                aug_path = find_path(level_graph,connect) #use dfs to find path
+                min_flow = find_min_flow(aug_path) #find min flow along the path
+                total_flow += min_flow #update current flow
+                if min_flow == False :  #blocking flow
+                    break
+                update_graph(level_graph,G_f,aug_path,min_flow,connect) #update level graph
+            if prev_flow == total_flow : #if flow is the same as previous round, then break
                 break
-            level_graph = update_graph(level_graph,G_f,aug_path,min_flow,connect)
 
-        if prev_flow == total_flow :
-            break
-
-    print("Max Flow : ",total_flow)
-
+        print("Number of vertice :" ,v_num)
+        print("Time cost : %.8f" % (time() - start))
+        print("-------------------------------------------")
 
 

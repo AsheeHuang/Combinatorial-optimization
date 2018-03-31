@@ -1,6 +1,5 @@
 from copy import deepcopy
-from Dinic import get_level_graph
-
+from time import time
 global balanced
 max_num = 1000000
 def read_graph(path) :
@@ -81,17 +80,18 @@ def forward_step(G,G_f,top,blocked):
     for layer in top :
         for v in top[layer]:
             for node in G[v]:
-                if G_f[v]['inflow'] > G_f[v]['outflow'] and balanced[node] == False :
-                    flow = min(G_f[v]['inflow'] - G_f[v]['outflow'], G[v][node])
-                    G_f[v]['outflow'] += flow-G_f[v][node]
-                    G_f[node]['inflow'] += flow-G_f[v][node]
-                    G_f[v][node] = flow
-                elif blocked[v] != 0 : #balance blocked node
-                    for node in G[v] :
-                        flow = min(G_f[v]['outflow'] - G_f[v]['inflow'],G[v][node] )
-                        G_f[v][node] -= flow
-                        G_f[v]['outflow'] -= flow
-                        G_f[node]['inflow'] -= flow
+                if balanced[node] == False:
+                    if G_f[v]['inflow'] > G_f[v]['outflow'] :
+                        flow = min(G_f[v]['inflow'] - G_f[v]['outflow'], G[v][node])
+                        G_f[v]['outflow'] += flow-G_f[v][node]
+                        G_f[node]['inflow'] += flow-G_f[v][node]
+                        G_f[v][node] = flow
+                    elif blocked[v] != 0 : #balance blocked node
+                        for node in G[v] :
+                            flow = min(G_f[v]['outflow'] - G_f[v]['inflow'],G[v][node]-G_f[v][node])
+                            G_f[v][node] -= flow
+                            G_f[v]['outflow'] -= flow
+                            G_f[node]['inflow'] -= flow
                         if G_f[v]['inflow'] == G_f[v]['outflow'] :
                             balanced[v] = True
                             break
@@ -103,17 +103,18 @@ def backward_step(G_b,G_f,top,blocked):
     for layer in range(len(top)-1,0,-1) :
         for v in top[layer] :
             for node in G_b[v]:
-                if G_f[v]['inflow'] < G_f[v]['outflow'] and balanced[node] == False:
-                        flow = min(G_f[v]['outflow']-G_f[v]['inflow'] , G_b[v][node])
-                        G_f[node]['outflow'] += flow-G_f[node][v]
-                        G_f[v]['inflow'] += flow-G_f[node][v]
-                        G_f[node][v] = flow
-                elif blocked[v] != 0 : #balance blocked node
-                    for node in G_b[v] :
-                        flow = min(G_f[v]['inflow'] - G_f[v]['outflow'],G_b[v][node] )
-                        G_f[node][v] -= flow
-                        G_f[v]['inflow'] -= flow
-                        G_f[node]['outflow'] -= flow
+                if balanced[node] == False :
+                    if G_f[v]['inflow'] < G_f[v]['outflow'] :
+                            flow = min(G_f[v]['outflow']-G_f[v]['inflow'] , G_b[v][node])
+                            G_f[node]['outflow'] += flow-G_f[node][v]
+                            G_f[v]['inflow'] += flow-G_f[node][v]
+                            G_f[node][v] = flow
+                    elif blocked[v] != 0 : #balance blocked node
+                        for node in G_b[v] :
+                            flow = min(G_f[v]['inflow'] - G_f[v]['outflow'],G_b[v][node]-G_f[node][v])
+                            G_f[node][v] -= flow
+                            G_f[v]['inflow'] -= flow
+                            G_f[node]['outflow'] -= flow
                         if G_f[v]['inflow'] == G_f[v]['outflow'] :
                             balanced[v] = True
                             break
@@ -121,19 +122,29 @@ def backward_step(G_b,G_f,top,blocked):
                 blocked[v] = -1  # BF_blocked
     return G_f
 if __name__ == "__main__" :
-    G,G_b,n = read_graph("./Data/test1.txt") #graph, # of vertices , # of edges
+    file = [i*1000 for i in  range(1,11)]
 
-    G_f = init_G_f(G)
-    top = top_order(G)
-    blocked = [0 for i in range(n)] #0 for unblocked, 1 for PF blocked ,-1 for BF blocked
-    balanced = [False] * n
+    for v_num in file :
+        data_path = "./Data/"+str(v_num)+".txt"
+        start = time()
+        G,G_b,n = read_graph(data_path) #graph,#graph from backward ,and num of vertices
 
-    for _ in range(10):
-    # while any(i == False for i in balanced[1:n-1]):
-        G_f = forward_step(G,G_f,top,blocked)
-        G_f = backward_step(G_b,G_f,top,blocked)
+        G_f = init_G_f(G) #init the flow in G
+        top = top_order(G) #get topological order of G
+        blocked = [0 for i in range(n)] #0 for unblocked, 1 for PF blocked ,-1 for BF blocked
+        balanced = [False] * n #every node is not yet balanced
 
+        for i in range(int(v_num/100)):
+        # while any(i == False for i in balanced[1:n-1]): #when every node is balanced, then stop
+            G_f = forward_step(G,G_f,top,blocked) #forward step
+            G_f = backward_step(G_b,G_f,top,blocked) #backward step
 
-    print("Max Flow :",G_f[0]['outflow'])
+        # for i in G_f :
+        #     print(i,G_f[i])
 
+        # for i in range(n) :
+            # print(balanced[i],blocked[i])
+        print("Number of vertice :" ,v_num)
+        print("Time cost : %.8f" % (time() - start))
+        print("-------------------------------------------")
 
