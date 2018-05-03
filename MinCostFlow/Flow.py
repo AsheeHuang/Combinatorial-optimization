@@ -72,10 +72,10 @@ def min_cycle(G) :
     return min,min_path
 def draw_network(G) :
     """----------Draw network-----"""
-    pos = {1: ([0, 2]), 2: ([0, 0]), 3: ([1, 0.8]),
-           4: ([2, 2]), 5: ([2, 0])}
+    # pos = {1: ([0, 2]), 2: ([0, 0]), 3: ([1, 0.8]),
+    #        4: ([2, 2]), 5: ([2, 0])}
 
-    # pos = nx.spring_layout(G, scale=100) #no fix
+    pos = nx.spring_layout(G, scale=100) #no fix
     # nx.draw_networkx(G, pos, with_labels=True)
     nx.draw_networkx_nodes(G, pos)
     # node_labels = nx.get_node_attributes(G, 'balance')

@@ -19,7 +19,7 @@ def select_t(G,gamma) : #select the node which excess flow smaller than -gamma
             return  node
     return False
 if __name__ == "__main__" :
-    path = "./test3.txt"
+    path = "./test4.txt"
     G = read_data(path)
     gamma = cal_gamma(nx.get_node_attributes(G,'e'))
     while all(nx.get_node_attributes(G,'e').values()) ==0 :
