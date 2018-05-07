@@ -12,7 +12,7 @@ def calED(G) :
             D.append(i)
     return E,D
 if __name__ == "__main__" :
-    path = './test.txt'
+    path = './test3.txt'
     G = read_data(path)
    #nx.min_cost_flow(G,demand = 'balance', capacity='u',weight='c')
     """-----------Init----------"""
@@ -21,7 +21,6 @@ if __name__ == "__main__" :
     while E :
         i, j = randint(0,len(E)-1), randint(0,len(D)-1)
         k,l = E[i],D[j]
-        print(E)
         if nx.has_path(G,k,l) :
             P = nx.shortest_path(G,k,l,weight='c')
             cost_along_path = [G[P[i]][P[i+1]]['u'] - G[P[i]][P[i+1]]['f'] for i in range(len(P)-1)]

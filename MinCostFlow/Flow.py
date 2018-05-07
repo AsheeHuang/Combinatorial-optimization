@@ -13,7 +13,7 @@ def read_data(path) :
     for i in range(n,n+m) :
         lines[i] = lines[i].split(' ')
         start,end,u,c = int(lines[i][0]), int(lines[i][1]),int(lines[i][2]),int(lines[i][3])
-        G.add_edge(start,end,f = 0,u = u,c = c,r = u,reverse_edge = False)
+        G.add_edge(start,end,f = 0,u = u,c = c,reverse_edge = False)
     return G
 # def update_G(G,P,delta) :
 #     print(P,delta)
@@ -47,6 +47,10 @@ def is_reverse(edge):
         return -1
     else :
         return 1
+def cal_reduce_cost(G) :
+    for edge in G.edges :
+        i,j = edge[0],edge[1]
+        G[i][j]['reduce_cost'] = G[i][j]['c'] - G.node[i]['potential'] + G.node[j]['potential']
 def classify_reverse(G) :
     R = []
     F = []
@@ -70,12 +74,54 @@ def min_cycle(G) :
             min = sumw
             min_path = cycle
     return min,min_path
-def draw_network(G) :
-    """----------Draw network-----"""
-    # pos = {1: ([0, 2]), 2: ([0, 0]), 3: ([1, 0.8]),
-    #        4: ([2, 2]), 5: ([2, 0])}
+def add_s_t(G) :
+    G.add_nodes_from(['s','t'],e = 0)
+    ex = 0
+    for i in G.node :
+        if G.node[i]['e'] > 0 :
+            G.add_edge('s',i,u = G.node[i]['e'], f = 0,c = 0,reverse_edge = False)
+            # G.node['s']['e'] += G.node[i]['e']
+            ex += G.node[i]['e']
+            G.node[i]['e'] = 0
+        elif G.node[i]['e'] < 0 :
+            G.add_edge(i, 't', u=-G.node[i]['e'],f = 0,c = 0,reverse_edge = False)
+            # G.node['t']['e'] -= G.node[i]['e']
+            G.node[i]['e'] = 0
+    return ex
+def update_Gx(G,max_flow) :
+    delete = []
+    for i in max_flow :
+        for j in max_flow[i] :
+            if max_flow[i][j] == 0 :
+                delete.append((i,j))
+    for i,j in delete :
+        del max_flow[i][j]
+    #find flow
+    while any(max_flow['s'].values()) != 0 :
+        cur_node = 's'
+        path = ['s']
+        while cur_node != 't' :
+            next = list(max_flow[cur_node].keys())[0]
+            path.append(next)
+            if cur_node == next :
+                return
+            cur_node = next
 
-    pos = nx.spring_layout(G, scale=100) #no fix
+        flow_along_path = [max_flow[path[i]][path[i+1]] for i in range(len(path)-1)]
+        bottleneck = min(flow_along_path)
+        update_G(G,path,bottleneck) #augment bottleneck flow
+        for i in range(len(path)-1) :
+            max_flow[path[i]][path[i+1]] -= bottleneck
+            if max_flow[path[i]][path[i+1]] == 0 :
+                del max_flow[path[i]][path[i+1]]
+            # if not max_flow[path[i]] :
+            #     del max_flow[path[i]]
+def draw_network(G,fix = True) :
+    """----------Draw network-----"""
+    pos = {1: ([0, 2]), 2: ([0, 0]), 3: ([1, 0.8]),
+            4: ([2, 2]), 5: ([2, 0]), 's' :([-1,1]), 't' : ([3,1])}
+    if fix == False :
+        pos = nx.spring_layout(G, scale=100) #no fix
     # nx.draw_networkx(G, pos, with_labels=True)
     nx.draw_networkx_nodes(G, pos)
     # node_labels = nx.get_node_attributes(G, 'balance')
@@ -94,4 +140,3 @@ def draw_network(G) :
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
 
     plt.show()
-
