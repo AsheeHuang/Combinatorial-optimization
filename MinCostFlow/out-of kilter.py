@@ -67,7 +67,7 @@ def residual_along_path(G,C) :
             res.append(G[C[i]][C[i + 1]]['u'] - G[C[i]][C[i+1]]['f'])
     return res
 if __name__ == '__main__' :
-    path = './test4.txt'
+    path = './test200.txt'
     G = read_data(path)
     add_s_t(G)
     set_potential(G)
@@ -86,6 +86,7 @@ if __name__ == '__main__' :
             r_along_path = residual_along_path(G,path)
             update_G(G,path,min(r_along_path))
         cal_reduce_cost(G)
+        kilter = cal_outofkilter(G)
 
 
     """-------End of algo----------"""

@@ -19,7 +19,7 @@ def select_t(G,gamma) : #select the node which excess flow smaller than -gamma
             return  node
     return False
 if __name__ == "__main__" :
-    path = "./test4.txt"
+    path = "./test200.txt"
     G = read_data(path)
     gamma = cal_gamma(nx.get_node_attributes(G,'e'))
     while all(nx.get_node_attributes(G,'e').values()) ==0 :
@@ -44,4 +44,4 @@ if __name__ == "__main__" :
             cost_flow += (G[edge[0]][edge[1]]['f'] * -G[edge[0]][edge[1]]['c'])
     print("Min cost flow : %d" % cost_flow)
 
-    draw_network(G)
+    # draw_network(G,fix = False)

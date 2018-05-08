@@ -50,7 +50,7 @@ def is_reverse(edge):
     else :
         return 1
 if __name__ == "__main__" :
-    G = read_data("test.txt")
+    G = read_data("test6.txt")
     # a= nx.min_cost_flow(G,demand = 'balance',capacity='u',weight='c')
     find_b_flow(G)
 

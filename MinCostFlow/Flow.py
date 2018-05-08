@@ -50,7 +50,10 @@ def is_reverse(edge):
 def cal_reduce_cost(G) :
     for edge in G.edges :
         i,j = edge[0],edge[1]
-        G[i][j]['reduce_cost'] = G[i][j]['c'] - G.node[i]['potential'] + G.node[j]['potential']
+        if G[i][j]['reverse_edge'] == False :
+            G[i][j]['reduce_cost'] = G[i][j]['c'] - G.node[i]['potential'] + G.node[j]['potential']
+        else :
+            G[i][j]['reduce_cost'] = -G[i][j]['c'] + G.node[i]['potential'] - G.node[j]['potential']
 def classify_reverse(G) :
     R = []
     F = []
@@ -116,6 +119,10 @@ def update_Gx(G,max_flow) :
                 del max_flow[path[i]][path[i+1]]
             # if not max_flow[path[i]] :
             #     del max_flow[path[i]]
+def set_potential(G,value = 0) :
+
+    for node in G.nodes :
+        G.nodes[node]['potential'] = value
 def draw_network(G,fix = True) :
     """----------Draw network-----"""
     pos = {1: ([0, 2]), 2: ([0, 0]), 3: ([1, 0.8]),
@@ -124,14 +131,16 @@ def draw_network(G,fix = True) :
         pos = nx.spring_layout(G, scale=100) #no fix
     # nx.draw_networkx(G, pos, with_labels=True)
     nx.draw_networkx_nodes(G, pos)
-    # node_labels = nx.get_node_attributes(G, 'balance')
-    nx.draw_networkx_labels(G, pos)
+    node_labels = nx.get_node_attributes(G, 'e')
+    nx.draw_networkx_labels(G, pos,labels=node_labels)
+    cal_reduce_cost(G)
     for edge in G.edges:
         start, end = edge[0], edge[1]
-        G[start][end]['f_u_c'] = [None for i in range(3)]
+        G[start][end]['f_u_c'] = [None for i in range(4)]
         G[start][end]['f_u_c'][0] = int(G[start][end]['f'])
         G[start][end]['f_u_c'][1] = G[start][end]['u']
         G[start][end]['f_u_c'][2] = G[start][end]['c']
+        G[start][end]['f_u_c'][3] = G[start][end]['reduce_cost']
 
     R, F = classify_reverse(G)
     nx.draw_networkx_edges(G, pos, R, edge_color='blue', style='dashed')

@@ -48,7 +48,7 @@ def draw_network(G) :
 
     plt.show()
 if __name__ == "__main__" :
-    path = './test2.txt'
+    path = './test6.txt'
     G = read_data(path)
     total_exflow = add_s_t(G)
     excess = 0
@@ -74,6 +74,6 @@ if __name__ == "__main__" :
             cost_flow += (G[edge[0]][edge[1]]['f'] * -G[edge[0]][edge[1]]['c'])
     print("Min cost flow : %d" % cost_flow)
 
-    draw_network(G)
+    # draw_network(G)
 
 

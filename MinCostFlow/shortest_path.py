@@ -12,7 +12,7 @@ def calED(G) :
             D.append(i)
     return E,D
 if __name__ == "__main__" :
-    path = './test3.txt'
+    path = './test4.txt'
     G = read_data(path)
    #nx.min_cost_flow(G,demand = 'balance', capacity='u',weight='c')
     """-----------Init----------"""
