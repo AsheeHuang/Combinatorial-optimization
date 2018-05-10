@@ -48,7 +48,7 @@ def draw_network(G) :
 
     plt.show()
 if __name__ == "__main__" :
-    path = './test6.txt'
+    path = './test200.txt'
     G = read_data(path)
     total_exflow = add_s_t(G)
     excess = 0

@@ -12,7 +12,7 @@ def calED(G) :
             D.append(i)
     return E,D
 if __name__ == "__main__" :
-    path = './test4.txt'
+    path = './test6.txt'
     G = read_data(path)
    #nx.min_cost_flow(G,demand = 'balance', capacity='u',weight='c')
     """-----------Init----------"""
@@ -31,9 +31,6 @@ if __name__ == "__main__" :
                 E.pop(i)
             if G.node[l]['e'] == 0 :
                 D.pop(j)
-
-
-
     cost_flow = 0
     for edge in G.edges :
         if G[edge[0]][edge[1]]['reverse_edge']:
