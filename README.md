@@ -1,3 +1,3 @@
 # Combinatorial-optimization
 
-My karzanov algorithm is wrong.
+There are still many mistakes in my code, I will fix it as soon as possible
